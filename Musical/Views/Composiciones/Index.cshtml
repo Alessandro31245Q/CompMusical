@@ -1,0 +1,224 @@
+﻿@model List<Musical.Models.ViewModels.ListTablaViewModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Tabla de Respuestas</h2>
+
+<hr />
+<a href="~/Composiciones/Nuevo" type="button" class="btn btn-primary">Nuevo Comentario</a>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <tr>
+                <th>#</th>
+                <th>Titulo</th>
+                <th>Autor</th>
+                <th>Genero</th>
+                <th>Instrumentos</th>
+                <th>Descripcion</th>
+            </tr>
+            @foreach (var oElemento in Model)
+            {
+                <tr>
+                    <td>@oElemento.Id</td>
+                    <td>@oElemento.Titulo</td>
+                    <td>@oElemento.Autor</td>
+                    <td>@oElemento.Genero</td>
+                    <td>@oElemento.Instrumentos</td>
+                    <td>@oElemento.Descripcion</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<div id="miGrafico" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script type="text/javascript">
+    // Recopila los datos para el gráfico
+    var generos = @Html.Raw(Json.Encode(Model.Select(item => item.Genero).Distinct()));
+    var cantidadPorGenero = @Html.Raw(Json.Encode(Model.GroupBy(item => item.Genero).Select(group => new { Genero = group.Key, Cantidad = group.Count() })));
+
+    // Convierte los datos a un formato entendible por Highcharts
+    var categorias = generos.map(function(genero) {
+        return genero;
+    });
+
+    var datos = cantidadPorGenero.map(function(item) {
+        return item.Cantidad;
+    });
+
+    Highcharts.chart('miGrafico', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Cantidad por Género Musical'
+        },
+        xAxis: {
+            categories: categorias
+        },
+        yAxis: {
+            title: {
+                text: 'Cantidad'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: datos
+        }]
+    });
+</script>
+
+<!-- Tu código HTML anterior -->
+
+<div id="autoresGrafico" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script type="text/javascript">
+    // Recopila los datos para el gráfico de autores
+    var autores = @Html.Raw(Json.Encode(Model.Select(item => item.Autor).Distinct()));
+    var cantidadPorAutor = @Html.Raw(Json.Encode(Model.GroupBy(item => item.Autor).Select(group => new { Autor = group.Key, Cantidad = group.Count() })));
+
+    // Convierte los datos a un formato entendible por Highcharts
+    var autoresCategorias = autores.map(function(autor) {
+        return autor;
+    });
+
+    var autoresDatos = cantidadPorAutor.map(function(item) {
+        return item.Cantidad;
+    });
+
+    Highcharts.chart('autoresGrafico', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Cantidad de Comentarios por Autor'
+        },
+        xAxis: {
+            categories: autoresCategorias
+        },
+        yAxis: {
+            title: {
+                text: 'Cantidad de Comentarios'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: autoresDatos
+        }]
+    });
+</script>
+<!-- Tu código HTML anterior -->
+
+<div id="instrumentosGrafico" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script type="text/javascript">
+    // Recopila los comentarios y procesa para contar instrumentos mencionados
+    var comentarios = @Html.Raw(Json.Encode(Model.Select(item => item.Descripcion)));
+    var instrumentosMencionados = {};
+
+    comentarios.forEach(function(comentario) {
+        // Dividir el comentario en palabras
+        var palabras = comentario.split(' ');
+
+        // Filtrar palabras que pueden ser instrumentos (puedes definir tu lista de instrumentos)
+        var instrumentos = palabras.filter(function(palabra) {
+            // Ejemplo: Si tienes una lista de instrumentos en un arreglo llamado "listaInstrumentos"
+            return listaInstrumentos.includes(palabra);
+        });
+
+        // Contar la cantidad de veces que se menciona cada instrumento
+        instrumentos.forEach(function(instrumento) {
+            if (instrumentosMencionados[instrumento]) {
+                instrumentosMencionados[instrumento]++;
+            } else {
+                instrumentosMencionados[instrumento] = 1;
+            }
+        });
+    });
+
+    // Convierte los datos a un formato entendible por Highcharts
+    var instrumentosCategorias = Object.keys(instrumentosMencionados);
+    var instrumentosDatos = Object.values(instrumentosMencionados);
+
+    Highcharts.chart('instrumentosGrafico', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Instrumentos Mencionados en Comentarios'
+        },
+        xAxis: {
+            categories: instrumentosCategorias
+        },
+        yAxis: {
+            title: {
+                text: 'Cantidad de Menciones'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: instrumentosDatos
+        }]
+    });
+</script>
+
+<div id="instrumentosGrafico" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script type="text/javascript">
+    // Recopila los comentarios y procesa para contar instrumentos mencionados
+    var comentarios = @Html.Raw(Json.Encode(Model.Select(item => item.Instrumentos)));
+    var instrumentosMencionados = {};
+
+    comentarios.forEach(function(comentario) {
+        // Dividir el comentario en palabras individuales separadas por comas
+        var palabras = comentario.split(',');
+
+        palabras.forEach(function(palabra) {
+            // Elimina espacios en blanco al principio y al final de la palabra
+            palabra = palabra.trim();
+
+            // Verifica si la palabra es un instrumento
+            if (palabra) { // Evita contar cadenas vacías
+                // Convierte la palabra a minúsculas para asegurar la coincidencia
+                palabra = palabra.toLowerCase();
+
+                if (instrumentosMencionados[palabra]) {
+                    instrumentosMencionados[palabra]++;
+                } else {
+                    instrumentosMencionados[palabra] = 1;
+                }
+            }
+        });
+    });
+
+    // Convierte los datos a un formato entendible por Highcharts
+    var instrumentosCategorias = Object.keys(instrumentosMencionados);
+    var instrumentosDatos = Object.values(instrumentosMencionados);
+
+    Highcharts.chart('instrumentosGrafico', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Instrumentos Mencionados en Comentarios'
+        },
+        xAxis: {
+            categories: instrumentosCategorias
+        },
+        yAxis: {
+            title: {
+                text: 'Cantidad de Menciones'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: instrumentosDatos
+        }]
+    });
+</script>

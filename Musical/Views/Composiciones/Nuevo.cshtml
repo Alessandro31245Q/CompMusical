@@ -1,0 +1,33 @@
+﻿@model Musical.Models.ViewModels.TablaViewModel
+@{
+    ViewBag.Title = "Nuevo";
+}
+
+<h2>Formulario</h2>
+
+@using (Html.BeginForm("Nuevo", "Composiciones", FormMethod.Post))
+{
+<div class="row">
+    <div class="col-md-12">
+        @Html.LabelFor(d => d.Titulo)
+        @Html.TextBoxFor(d => d.Titulo, "", new { @class = "form-control" })
+        @Html.LabelFor(d => d.Autor)
+        @Html.TextBoxFor(d => d.Autor, "", new { @class = "form-control" })
+        @Html.LabelFor(d => d.Genero)
+        @Html.DropDownListFor(d => d.Genero, new SelectList(new[] { "Pop","Rock","Jazz","Blues","Reggae","Hip-Hop","R&B (Rhythm and Blues)","Rap",
+            "Country","Clásica","Metal","Electrónica","Indie","Funk","Soul","Folk","Punk","Reggaetón","Ska",
+            "Disco","Gospel","Alternativa","Dance","Trance","Salsa","Merengue","Bachata","Flamenco",
+            "Cumbia","Vallenato"}), "Seleccione un género", new { @class = "form-control" })
+        @Html.LabelFor(d => d.Instrumentos)
+        @Html.TextBoxFor(d => d.Instrumentos, "", new { @class = "form-control" })
+        @Html.LabelFor(d => d.Descripcion)
+        @Html.TextAreaFor(d => d.Descripcion, new { @class = "form-control", rows = 4 })
+
+        <br />
+        <div>
+            <input value="Guardar" class="btn btn-primary" type="submit" />
+        </div>
+    </div>
+</div>
+}
+
